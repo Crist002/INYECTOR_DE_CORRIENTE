@@ -1,2 +1,2 @@
-# INYECTOR_DE_CORRIENTE
+# INYECTOR DE CORRIENTE
 Inyector de Corriente
