@@ -60,7 +60,7 @@ void setup() {
   Visual();
   delay(2000);
   contenido1= "";
-  contenido2="Tiempo: 000 Seg";
+  contenido2="Tiempo: 000,000";
   Visual();
   Lectura_EEPROM();
   relacion1 = (digito4*1000) + (digito3*100) + (digito2*10) + digito1;
@@ -77,13 +77,13 @@ void loop() {
     fila = 0;
     contenido1= "Corriente       ";
     fila2 = 0;
-    contenido2="Tiempo: 000 Seg";
+    contenido2="Tiempo: 000,000";
     Visual2();
   }else if(est_tension == 1){
     fila = 0;
     contenido1= "Auxiliar        ";
     fila2 = 0;
-    contenido2="Tiempo: 000 Seg";
+    contenido2="Tiempo: 000,000";
     Visual2();
   }else{
     fila=0;
@@ -245,12 +245,13 @@ void cronometro(){
     fila =0;
     contenido1="";
     fila2=0;
-    contenido2 = "Tiempo: 000 Seg";
+    contenido2 = "Tiempo: 000,000";
     Visual();
     digitalWrite(rele, HIGH);
     while(val == 1){
       unsigned long tiempo = millis();
       int segundo = tiempo/1000;
+      int milisegundo = tiempo -(1000*segundo);
       //----------COMIENZA VISUAL DE TIEMPO----------
       fila2=8;
       if(segundo<10){
@@ -259,6 +260,15 @@ void cronometro(){
           contenido2 = "0" + String(segundo);
       }else{
           contenido2= segundo;  
+      }
+      Visual2();
+      fila2=12;
+      if(milisegundo<10){
+          contenido2= "00" + String(milisegundo);
+      }else if((milisegundo<100)&&(milisegundo>=10)){
+          contenido2 = "0" + String(milisegundo);
+      }else{
+          contenido2= milisegundo;
       }
       Visual2();
       //----------TERMINA VISUAL DE TIEMPO----------
@@ -374,7 +384,7 @@ void Visual2(){    //Configuro lo que se visualizara en el LCD
 void reset(){
   new_value = 0;
   fila2= 0;
-  contenido2 = "Tiempo: 000 Seg";
+  contenido2 = "Tiempo: 000,000";
   Visual2();
 }
 
