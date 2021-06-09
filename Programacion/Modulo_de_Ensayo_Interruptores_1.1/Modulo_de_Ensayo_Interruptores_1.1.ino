@@ -1,5 +1,5 @@
 //////////////////////////// PROYECTO SOL TECNICA /////////////////////////
-
+#include <EEPROM.h>
 #include<Wire.h>
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27,16,2);
@@ -11,9 +11,16 @@ byte fila2;
 String contenido1;
 String contenido2;
 //Variables del sensor
+float Val_prom;
+int vuelta;
 float val_max=0;
 float val_comp = 0.1;
 float relacion=1;
+int digito1=0;
+int digito2=0;
+int digito3=0;
+int digito4=0;
+int relacion1;
 //Variables interruptores ,rele y auxiliar
 byte bot_start = 2;
 byte bot_reset = 3;
@@ -22,9 +29,13 @@ byte bot_tension = 5;
 byte rele = 8;
 byte bot_auxiliar = 10;
 boolean est_start = 0;
+boolean seg_start = 0;
 boolean est_reset = 0;
+boolean seg_reset = 0;
 boolean est_corriente = 0;
+boolean seg_corriente = 0;
 boolean est_tension = 0;
+boolean seg_tension = 0;
 boolean est_auxiliar = 0;
 //RESET DE MILLIS
 extern volatile unsigned long timer0_millis;
@@ -51,6 +62,9 @@ void setup() {
   contenido1= "";
   contenido2="00:00:00,000";
   Visual();
+  Lectura_EEPROM();
+  relacion1 = (digito4*1000) + (digito3*100) + (digito2*10) + digito1;
+  relacion = relacion1/5;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,14 +100,83 @@ void loop() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void lectura_botones(){
   est_start = digitalRead(bot_start);
   est_reset = digitalRead(bot_reset);
   est_corriente = digitalRead(bot_corriente);
   est_tension = digitalRead(bot_tension);
   est_auxiliar = digitalRead(bot_auxiliar);
+  if((seg_start == 1)&&(est_start == 0)){   //Configuracion de est_start
+    seg_start = 0;
+  }
+  if((seg_start == 1)&&(est_start == 1)){
+    est_start = 0;  
+  }
+  if((seg_start == 0)&&(est_start == 1)){
+    est_start = 1;
+    seg_start = 1;
+  }
   
+  if((seg_reset == 1)&&(est_reset == 0)){   //Configuracion de est_reset
+    seg_reset = 0;
+  }
+  if((seg_reset == 1)&&(est_reset == 1)){
+    est_reset = 0;  
+  }
+  if((seg_reset == 0)&&(est_reset == 1)){
+    est_reset = 1;
+    seg_reset = 1;
+  }
+}
+
+void lectura_botones2(){
+  est_start = digitalRead(bot_start);
+  est_reset = digitalRead(bot_reset);
+  est_corriente = digitalRead(bot_corriente);
+  est_tension = digitalRead(bot_tension);
+  est_auxiliar = digitalRead(bot_auxiliar);
+  if((seg_start == 1)&&(est_start == 0)){   //Configuracion de est_start
+    seg_start = 0;
+  }
+  if((seg_start == 1)&&(est_start == 1)){
+    est_start = 0;  
+  }
+  if((seg_start == 0)&&(est_start == 1)){
+    est_start = 1;
+    seg_start = 1;
+  }
+  
+  if((seg_reset == 1)&&(est_reset == 0)){   //Configuracion de est_reset
+    seg_reset = 0;
+  }
+  if((seg_reset == 1)&&(est_reset == 1)){
+    est_reset = 0;  
+  }
+  if((seg_reset == 0)&&(est_reset == 1)){
+    est_reset = 1;
+    seg_reset = 1;
+  }
+  if((seg_tension == 1)&&(est_tension == 0)){   //Configuracion de est_tension
+    seg_tension = 0;
+  }
+  if((seg_tension == 1)&&(est_tension == 1)){
+    est_tension = 0;  
+  }
+  if((seg_tension == 0)&&(est_tension == 1)){
+    est_tension = 1;
+    seg_tension = 1;
+  }
+  
+  if((seg_corriente == 1)&&(est_corriente == 0)){   //Configuracion de est_corriente
+    seg_corriente = 0;
+  }
+  if((seg_corriente == 1)&&(est_corriente == 1)){
+    est_corriente = 0;  
+  }
+  if((seg_corriente == 0)&&(est_corriente == 1)){
+    est_corriente = 1;
+    seg_corriente = 1;
+  }
 }
 
 void Conf_corriente(){
@@ -102,11 +185,51 @@ void Conf_corriente(){
   fila2= 0;
   contenido2="             /5A";
   Visual();
-  int contador=0;
+  int pos=1;
+  long tiempo=0;
+  long set_tiempo=millis();
   while(1){
-    lectura_botones();
-    
+    tiempo = millis();
+    lectura_botones2();
+    fila2 = 9;
+    contenido2= String(digito4) + String(digito3) + String(digito2) + String(digito1);
+    Visual2();
+    if(tiempo>(set_tiempo + 500)){
+      lcd.setCursor(13-pos,1);
+      lcd.print(" ");
+    }
+    if(tiempo>(set_tiempo + 1000)){
+      set_tiempo=millis();
+    }
+    if(est_corriente == 1){
+      switch(pos){
+        case 1: digito1++; if(digito1>9){digito1=9;} break;  
+        case 2: digito2++; if(digito2>9){digito2=9;} break;  
+        case 3: digito3++; if(digito3>9){digito3=9;} break;  
+        case 4: digito4++; if(digito4>9){digito4=9;} break;  
+      }
+    }
+    if(est_tension == 1){
+      switch(pos){
+        case 1: digito1--; if(digito1<0){digito1=0;} break;  
+        case 2: digito2--; if(digito2<0){digito2=0;} break;  
+        case 3: digito3--; if(digito3<0){digito3=0;} break;  
+        case 4: digito4--; if(digito4<0){digito4=0;} break;  
+      }
+    }
+    if(est_reset == 1){
+      pos++;
+      if(pos>4){pos = 1;}
+    }
+    if(est_start == 1){
+      relacion1 = (digito4*1000) + (digito3*100) + (digito2*10) + digito1;
+      relacion = relacion1/5;
+      Escritura_EEPROM();
+      break;  //Sale del bucle while
+    }
   }
+  seg_tension = 0;
+  seg_corriente = 0;
   delay(2000);
   fila=0;
   fila2=0;
@@ -119,6 +242,8 @@ void Conf_corriente(){
 void cronometro(){
     setMillis(new_value);
     byte val = 1;
+    fila =0;
+    contenido1="";
     fila2=0;
     contenido2 = "  :  :  ,";
     int v_segundo;
@@ -197,7 +322,7 @@ void cronometro(){
           if(val_max < val_comp){
             digitalWrite(rele, LOW);
             val = 0;
-            fila= 11;
+            fila= 0;
             contenido1= "0.00";
             Visual2();
           }
@@ -225,13 +350,39 @@ void corriente(){
     val_max = tension +val_max;
   }
   val_max = (val_max/600)*1.5707963;
-  float Val_ajustado = val_max*relacion;
+  vuelta++;
+  Val_prom = Val_prom + val_max;
+  if(vuelta == 5){
+  float Val_ajustado = (Val_prom/5)*relacion;
   fila = 0;
-  contenido1 = Val_ajustado;
-  Visual2();
-  fila = 15;
-  contenido1 = "A";
-  Visual2();
+  if((Val_ajustado <10000)&&(Val_ajustado>=1000)){
+    contenido1 = Val_ajustado;
+    Visual2();
+    fila = 4;
+    contenido1= "           A";
+    Visual2();
+  }else if((Val_ajustado <1000)&&(Val_ajustado>=100)){
+    contenido1 = Val_ajustado;
+    Visual2();
+    fila = 3;
+    contenido1= "            A";
+    Visual2();
+  }else if((Val_ajustado <100)&&(Val_ajustado>=10)){
+    contenido1 = Val_ajustado;
+    Visual2();
+    fila = 4;
+    contenido1= "           A";
+    Visual2();
+  }else if(Val_ajustado <10){
+    contenido1 = Val_ajustado;
+    Visual2();
+    fila = 4;
+    contenido1= "           A";
+    Visual2();
+  }
+  Val_prom = 0;
+  vuelta = 0;
+  }
 }
 
 void Visual(){    //Configuro lo que se visualizara en el LCD
@@ -261,4 +412,18 @@ void setMillis(unsigned long new_millis){
   cli();
   timer0_millis = new_millis;
   SREG = oldSREG;
+}
+
+void Lectura_EEPROM(){
+  digito1 = EEPROM.read(1);
+  digito2 = EEPROM.read(2);
+  digito3 = EEPROM.read(3);
+  digito4 = EEPROM.read(4);
+}
+
+void Escritura_EEPROM(){
+  EEPROM.put(1,digito1);
+  EEPROM.put(2,digito2);
+  EEPROM.put(3,digito3);
+  EEPROM.put(4,digito4);
 }
