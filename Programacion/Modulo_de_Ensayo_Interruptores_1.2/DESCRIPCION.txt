@@ -1,0 +1,2 @@
+Se cambio la visualizacion del tiempo, solo se muestran los segundos en un rango de 0 a 999
+Se cambio en la configuracion de la relacion de transformacion el menu, ahora se visualiza el valor guardado

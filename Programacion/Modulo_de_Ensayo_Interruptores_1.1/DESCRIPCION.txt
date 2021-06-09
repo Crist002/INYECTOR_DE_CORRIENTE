@@ -1,0 +1,3 @@
+Cuando el selector esta en el medio, al pulsar start se entra en el menu de seteo de corriente
+Este valor se guarda en la memoria EEPROM cada vez que se lo cambia
+Se cambiaron algunos ajustes acorde a la visualizacion
