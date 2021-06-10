@@ -1,0 +1,9 @@
+Se cambio la forma de responder al lcd y en la obtencion de datos para darle prioridad al tiempo de obtencion de valores
+Se comprobo en el pin 6 el tiempo del bucle del cronometro tanto con la parte de corriente como en el auxiliar
+Datos: (los datos de tiempo son aproximados)
+120 valores de obtencion --> 20mS
+Mostrar LCD corriente --> 10ms
+Mostrar LCD Tiempo --> 10ms
+1 obtencion de valor sin mostrar en LCD --> 150 us
+calculo corriente --> 100 us
+1 vuelta con Muestra de Valores en AUXILIAR --> 23ms
